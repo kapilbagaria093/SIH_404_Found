@@ -1,0 +1,91 @@
+{
+    "total_tickets": 20,
+    "total_clusters": 5,
+    "clusters": [
+        {
+            "cluster_id": 0,
+            "size": 11,
+            "top_terms": [
+                "error",
+                "working",
+                "vpn",
+                "new",
+                "sap",
+                "printer",
+                "shared",
+                "installation",
+                "requesting",
+                "slow"
+            ],
+            "theme": "Potential Theme: error & working issues"
+        },
+        {
+            "cluster_id": 1,
+            "size": 2,
+            "top_terms": [
+                "reset",
+                "password",
+                "need",
+                "email",
+                "sap",
+                "working",
+                "wifi",
+                "slow",
+                "shared",
+                "vpn"
+            ],
+            "theme": "Potential Theme: reset & password issues"
+        },
+        {
+            "cluster_id": 2,
+            "size": 2,
+            "top_terms": [
+                "wifi",
+                "working",
+                "vpn",
+                "slow",
+                "shared",
+                "sap",
+                "reset",
+                "requesting",
+                "printer",
+                "password"
+            ],
+            "theme": "Potential Theme: wifi & working issues"
+        },
+        {
+            "cluster_id": 3,
+            "size": 2,
+            "top_terms": [
+                "laptop",
+                "slow",
+                "wifi",
+                "working",
+                "shared",
+                "vpn",
+                "reset",
+                "requesting",
+                "printer",
+                "sap"
+            ],
+            "theme": "Potential Theme: laptop & slow issues"
+        },
+        {
+            "cluster_id": 4,
+            "size": 3,
+            "top_terms": [
+                "outlook",
+                "emails",
+                "email",
+                "new",
+                "wifi",
+                "working",
+                "vpn",
+                "slow",
+                "shared",
+                "sap"
+            ],
+            "theme": "Potential Theme: outlook & emails issues"
+        }
+    ]
+}
