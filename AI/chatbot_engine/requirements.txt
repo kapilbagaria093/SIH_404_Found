@@ -1,0 +1,4 @@
+rasa==3.6.0
+tensorflow==2.11.1
+numpy==1.24.4
+PyYAML==5.4.1

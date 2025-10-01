@@ -1,0 +1,27 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - reset_password
+  - check_system_status
+
+entities:
+  - application
+
+responses:
+  utter_greet:
+  - text: "Hey! I'm the POWERGRID IT assistant. How can I help?"
+
+  utter_goodbye:
+  - text: "Bye"
+
+  utter_ask_application_for_reset:
+  - text: "Sure, which application do you need a password reset for?"
+  
+  utter_submit_password_reset:
+  - text: "Okay, I have submitted a (simulated) password reset request for your {application} account."
+
+# This is the most important part: declaring a custom action
+actions:
+- action_check_status

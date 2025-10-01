@@ -1,0 +1,14 @@
+version: "3.1"
+
+stories:
+- story: password reset path
+  steps:
+  - intent: reset_password
+  - action: utter_submit_password_reset
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: system status path
+  steps:
+  - intent: check_system_status
+  - action: action_check_status # This triggers our custom Python code

@@ -1,0 +1,26 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+
+- intent: reset_password
+  examples: |
+    - I need to reset my password
+    - my password for [SAP](application) is not working
+    - can you help me reset my [outlook](application) password?
+    - reset [GLPI](application) password
+
+- intent: check_system_status
+  examples: |
+    - is [SAP](application) down?
+    - what is the status of the [VPN](application)?
+    - check system status for [email](application)
