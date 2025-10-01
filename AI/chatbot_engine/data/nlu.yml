@@ -24,3 +24,11 @@ nlu:
     - is [SAP](application) down?
     - what is the status of the [VPN](application)?
     - check system status for [email](application)
+
+- intent: report_it_issue
+  examples: |
+    - my pc isnt working
+    - my laptop is very slow
+    - the computer is broken
+    - something is wrong with my machine
+    - my screen is frozen

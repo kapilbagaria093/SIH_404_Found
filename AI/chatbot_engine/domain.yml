@@ -5,6 +5,7 @@ intents:
   - goodbye
   - reset_password
   - check_system_status
+  - report_it_issue
 
 entities:
   - application
@@ -21,6 +22,9 @@ responses:
   
   utter_submit_password_reset:
   - text: "Okay, I have submitted a (simulated) password reset request for your {application} account."
+
+  utter_acknowledge_it_issue:
+  - text: "I understand you're having an IT issue. I have created a general ticket for the support team to investigate."
 
 # This is the most important part: declaring a custom action
 actions:

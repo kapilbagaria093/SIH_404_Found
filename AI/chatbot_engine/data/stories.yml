@@ -12,3 +12,8 @@ stories:
   steps:
   - intent: check_system_status
   - action: action_check_status # This triggers our custom Python code
+
+- story: general IT issue path
+  steps:
+  - intent: report_it_issue
+  - action: utter_acknowledge_it_issue
