@@ -3,29 +3,30 @@ version: "3.1"
 intents:
   - greet
   - goodbye
-  - reset_password
+  - search_knowledge_base
+  - report_issue
   - check_system_status
-  - report_it_issue
 
 entities:
   - application
+  - search_topic
+  - issue_description
 
 responses:
   utter_greet:
-  - text: "Hey! I'm the POWERGRID IT assistant. How can I help?"
-
+  - text: "Hey! I'm the POWERGRID IT assistant. How can I help? You can ask me for help or to create a ticket."
   utter_goodbye:
-  - text: "Bye"
+  - text: "Goodbye!"
+  utter_ask_for_issue_details:
+  - text: "Okay, I can create a ticket for you. Please describe your issue."
+  utter_ticket_created:
+  - text: "Thank you. I have created a ticket for your issue: '{issue_description}'. The IT team will get in touch with you shortly."
+  utter_solution_found:
+  - text: "I found a potential solution in our knowledge base:\n\n{solution_text}"
+  utter_no_solution_found:
+  - text: "I'm sorry, I couldn't find a direct solution for that in our knowledge base. Would you like me to create a ticket for you?"
 
-  utter_ask_application_for_reset:
-  - text: "Sure, which application do you need a password reset for?"
-  
-  utter_submit_password_reset:
-  - text: "Okay, I have submitted a (simulated) password reset request for your {application} account."
-
-  utter_acknowledge_it_issue:
-  - text: "I understand you're having an IT issue. I have created a general ticket for the support team to investigate."
-
-# This is the most important part: declaring a custom action
 actions:
 - action_check_status
+- action_search_kb
+- action_create_ticket

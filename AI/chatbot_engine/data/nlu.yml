@@ -32,3 +32,17 @@ nlu:
     - the computer is broken
     - something is wrong with my machine
     - my screen is frozen
+  
+- intent: search_knowledge_base
+  examples: |
+    - how do I fix my [vpn](search_topic)?
+    - can you help me with a [printer](search_topic) issue?
+    - I need help with my [SAP](search_topic) password
+    - search for a solution for my [laptop](search_topic)
+
+- intent: report_issue
+  examples: |
+    - my [laptop screen is cracked](issue_description)
+    - I need to report a problem. My [outlook is not syncing](issue_description).
+    - create a ticket for me
+    - log an issue

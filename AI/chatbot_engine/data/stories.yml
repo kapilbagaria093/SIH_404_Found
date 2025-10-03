@@ -17,3 +17,20 @@ stories:
   steps:
   - intent: report_it_issue
   - action: utter_acknowledge_it_issue
+
+- story: knowledge base search success
+  steps:
+  - intent: search_knowledge_base
+  - action: action_search_kb
+
+- story: create ticket after failed search
+  steps:
+  - intent: search_knowledge_base
+  - action: action_search_kb
+  - intent: report_issue
+  - action: utter_ask_for_issue_details
+
+- story: user directly reports an issue
+  steps:
+  - intent: report_issue
+  - action: action_create_ticket

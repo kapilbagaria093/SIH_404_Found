@@ -17,7 +17,7 @@ df_csv = pd.read_csv("tickets_for_training.csv")
 try:
     print("Attempting to load data from the database...")
     # IMPORTANT: Replace with your actual password and database name
-    DATABASE_URL = "postgresql://postgres:YOUR_PASSWORD@localhost/powergrid_helpdesk"
+    DATABASE_URL = "postgresql://postgres:kapilpostgres@localhost/powergrid_helpdesk"
     engine = create_engine(DATABASE_URL)
     query = "SELECT description, category FROM tickets WHERE status = 'Resolved';"
     df_db = pd.read_sql(query, engine)
