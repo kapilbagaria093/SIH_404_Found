@@ -1,13 +1,28 @@
 version: "3.1"
 
 rules:
+- rule: Activate ticket form
+  steps:
+  - intent: report_issue
+  - action: ticket_form
+  - active_loop: ticket_form
 
-- rule: Say goodbye anytime the user says goodbye
+- rule: Submit ticket form
+  condition:
+  - active_loop: ticket_form
+  steps:
+  - action: ticket_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_submit_ticket
+
+- rule: Handle basic chitchat
+  steps:
+  - intent: chitchat
+  - action: utter_iamabot
+
+- rule: Say goodbye
   steps:
   - intent: goodbye
-  - action: utter_goodbye
-
-- rule: Say 'I am a bot' anytime the user challenges
-  steps:
-  - intent: bot_challenge
   - action: utter_goodbye

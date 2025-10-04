@@ -1,0 +1,11 @@
+{
+  "0": "affirm",
+  "1": "check_system_status",
+  "2": "chitchat",
+  "3": "deny",
+  "4": "goodbye",
+  "5": "greet",
+  "6": "inform_urgency",
+  "7": "report_issue",
+  "8": "search_knowledge_base"
+}

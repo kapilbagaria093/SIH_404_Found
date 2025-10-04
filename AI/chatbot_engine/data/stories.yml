@@ -1,36 +1,47 @@
 version: "3.1"
 
 stories:
-- story: password reset path
+- story: user greets
   steps:
-  - intent: reset_password
-  - action: utter_submit_password_reset
-  - intent: goodbye
-  - action: utter_goodbye
+  - intent: greet
+  - action: utter_greet
 
-- story: system status path
+- story: interactive KB search - success
+  steps:
+  - intent: search_knowledge_base
+  - action: action_search_kb
+  - intent: affirm
+  - action: utter_glad_it_helped
+
+- story: interactive KB search - failure, then create ticket
+  steps:
+  - intent: search_knowledge_base
+  - action: action_search_kb
+  - intent: deny
+  - action: utter_offer_create_ticket
+  - intent: affirm
+  - action: ticket_form
+  - active_loop: ticket_form
+
+- story: interactive KB search - failure, user declines ticket
+  steps:
+  - intent: search_knowledge_base
+  - action: action_search_kb
+  - intent: deny
+  - action: utter_offer_create_ticket
+  - intent: deny
+  - action: utter_ok_no_ticket
+
+- story: direct KB search fails, user wants to create ticket
+  steps:
+  - intent: search_knowledge_base
+  - action: action_search_kb
+  - action: utter_no_solution_found
+  - intent: affirm
+  - action: ticket_form
+  - active_loop: ticket_form
+
+- story: user checks system status
   steps:
   - intent: check_system_status
-  - action: action_check_status # This triggers our custom Python code
-
-- story: general IT issue path
-  steps:
-  - intent: report_it_issue
-  - action: utter_acknowledge_it_issue
-
-- story: knowledge base search success
-  steps:
-  - intent: search_knowledge_base
-  - action: action_search_kb
-
-- story: create ticket after failed search
-  steps:
-  - intent: search_knowledge_base
-  - action: action_search_kb
-  - intent: report_issue
-  - action: utter_ask_for_issue_details
-
-- story: user directly reports an issue
-  steps:
-  - intent: report_issue
-  - action: action_create_ticket
+  - action: action_check_status

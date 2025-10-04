@@ -1,0 +1,75 @@
+{
+  "type": "IntentMaxHistoryTrackerFeaturizer",
+  "state_featurizer": {
+    "action_texts": [],
+    "entity_tag_specs": [],
+    "feature_states": {
+      "intent": {
+        "affirm": 0,
+        "back": 1,
+        "check_system_status": 2,
+        "chitchat": 3,
+        "deny": 4,
+        "goodbye": 5,
+        "greet": 6,
+        "inform_urgency": 7,
+        "nlu_fallback": 8,
+        "out_of_scope": 9,
+        "report_issue": 10,
+        "restart": 11,
+        "search_knowledge_base": 12,
+        "session_start": 13
+      },
+      "action_name": {
+        "action_listen": 0,
+        "action_restart": 1,
+        "action_session_start": 2,
+        "action_default_fallback": 3,
+        "action_deactivate_loop": 4,
+        "action_revert_fallback_events": 5,
+        "action_default_ask_affirmation": 6,
+        "action_default_ask_rephrase": 7,
+        "action_two_stage_fallback": 8,
+        "action_unlikely_intent": 9,
+        "action_back": 10,
+        "...": 11,
+        "action_extract_slots": 12,
+        "action_check_status": 13,
+        "action_search_kb": 14,
+        "validate_ticket_form": 15,
+        "utter_ask_if_solution_helped": 16,
+        "utter_ask_issue_description": 17,
+        "utter_ask_urgency": 18,
+        "utter_ask_urgency_invalid": 19,
+        "utter_glad_it_helped": 20,
+        "utter_goodbye": 21,
+        "utter_greet": 22,
+        "utter_iamabot": 23,
+        "utter_no_solution_found": 24,
+        "utter_offer_create_ticket": 25,
+        "utter_ok_no_ticket": 26,
+        "utter_solution_found": 27,
+        "utter_submit_ticket": 28,
+        "ticket_form": 29
+      },
+      "entities": {
+        "application": 0,
+        "issue_description": 1,
+        "search_topic": 2,
+        "urgency": 3
+      },
+      "slots": {
+        "issue_description_0": 0,
+        "urgency_0": 1,
+        "urgency_1": 2,
+        "urgency_2": 3,
+        "urgency_3": 4
+      },
+      "active_loop": {
+        "ticket_form": 0
+      }
+    }
+  },
+  "remove_duplicates": true,
+  "max_history": 5
+}

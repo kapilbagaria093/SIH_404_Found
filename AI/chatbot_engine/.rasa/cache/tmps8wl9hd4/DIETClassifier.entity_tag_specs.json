@@ -1,0 +1,36 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-application",
+      "2": "I-application",
+      "3": "L-application",
+      "4": "U-application",
+      "5": "B-issue_description",
+      "6": "I-issue_description",
+      "7": "L-issue_description",
+      "8": "U-issue_description",
+      "9": "B-search_topic",
+      "10": "I-search_topic",
+      "11": "L-search_topic",
+      "12": "U-search_topic",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-application": 1,
+      "I-application": 2,
+      "L-application": 3,
+      "U-application": 4,
+      "B-issue_description": 5,
+      "I-issue_description": 6,
+      "L-issue_description": 7,
+      "U-issue_description": 8,
+      "B-search_topic": 9,
+      "I-search_topic": 10,
+      "L-search_topic": 11,
+      "U-search_topic": 12,
+      "O": 0
+    },
+    "num_tags": 13
+  }
+]

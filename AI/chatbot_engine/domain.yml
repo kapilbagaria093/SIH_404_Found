@@ -3,30 +3,71 @@ version: "3.1"
 intents:
   - greet
   - goodbye
+  - affirm
+  - deny
   - search_knowledge_base
   - report_issue
   - check_system_status
+  - inform_urgency
+  - chitchat
 
 entities:
   - application
   - search_topic
   - issue_description
+  - urgency
+
+slots:
+  issue_description:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: issue_description
+  urgency:
+    type: categorical
+    values:
+      - low
+      - medium
+      - high
+    mappings:
+    - type: from_entity
+      entity: urgency
 
 responses:
   utter_greet:
-  - text: "Hey! I'm the POWERGRID IT assistant. How can I help? You can ask me for help or to create a ticket."
+  - text: "Hey! I'm the POWERGRID IT assistant. How can I help?"
   utter_goodbye:
-  - text: "Goodbye!"
-  utter_ask_for_issue_details:
-  - text: "Okay, I can create a ticket for you. Please describe your issue."
-  utter_ticket_created:
-  - text: "Thank you. I have created a ticket for your issue: '{issue_description}'. The IT team will get in touch with you shortly."
+  - text: "Goodbye! Let me know if you need anything else."
+  utter_ask_issue_description:
+  - text: "Okay, I can create a ticket. First, please describe your issue in one sentence."
+  utter_ask_urgency:
+  - text: "Got it. And how urgent is this issue? (low, medium, or high)"
+  utter_submit_ticket:
+  - text: "Thank you. I have created a {urgency} priority ticket for the issue: '{issue_description}'. The IT team will be in touch."
   utter_solution_found:
-  - text: "I found a potential solution in our knowledge base:\n\n{solution_text}"
+  - text: "Based on your request, I found a potential solution in our knowledge base:\n\n{solution_text}"
+  utter_ask_if_solution_helped:
+  - text: "Did this solution help resolve your issue?"
+  utter_glad_it_helped:
+  - text: "Excellent! I'm glad I could help. Is there anything else you need?"
+  utter_offer_create_ticket:
+  - text: "I'm sorry to hear that didn't work. Would you like me to create a ticket for you so a human agent can take a look?"
   utter_no_solution_found:
-  - text: "I'm sorry, I couldn't find a direct solution for that in our knowledge base. Would you like me to create a ticket for you?"
+  - text: "I couldn't find a direct solution for that. Would you like me to create a ticket?"
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa."
+  utter_ok_no_ticket:
+  - text: "Okay, I will not create a ticket. Let me know if you need anything else."
+  utter_ask_urgency_invalid:
+  - text: "That's not a valid urgency. Please choose from low, medium, or high."
 
 actions:
 - action_check_status
 - action_search_kb
-- action_create_ticket
+- validate_ticket_form
+
+forms:
+  ticket_form:
+    required_slots:
+      - issue_description
+      - urgency

@@ -1,0 +1,18 @@
+{
+  "urgent": "high",
+  "high": "high",
+  "vpn": "vpn",
+  "printer": "printer",
+  "sap": "SAP",
+  "laptop": "laptop",
+  "monitor": "monitor",
+  "outlook": "outlook",
+  "wifi": "wifi",
+  "laptop screen is cracked": "laptop screen is cracked",
+  "outlook is not syncing": "outlook is not syncing",
+  "printer is jammed again": "printer is jammed again",
+  "email": "email",
+  "glpi": "glpi",
+  "low": "low",
+  "medium": "medium"
+}

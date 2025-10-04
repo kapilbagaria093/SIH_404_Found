@@ -1,44 +1,54 @@
 version: "3.1"
-
 nlu:
 - intent: greet
   examples: |
     - hey
-    - hello
+    - hello there
     - hi
+    - good morning
+    - good evening
+    - hey there bot
 
 - intent: goodbye
   examples: |
-    - bye
+    - bye bye
     - goodbye
+    - see you around
+    - talk to you later
+    - stop the conversation
 
-- intent: reset_password
+- intent: affirm
   examples: |
-    - I need to reset my password
-    - my password for [SAP](application) is not working
-    - can you help me reset my [outlook](application) password?
-    - reset [GLPI](application) password
+    - yes please
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+    - ok sure
+    - yup
+    - sounds right
+    - please do
 
-- intent: check_system_status
+- intent: deny
   examples: |
-    - is [SAP](application) down?
-    - what is the status of the [VPN](application)?
-    - check system status for [email](application)
+    - no thanks
+    - never
+    - I don't want to
+    - don't do that
+    - no way
+    - not really
+    - nevermind
+    - cancel that
 
-- intent: report_it_issue
-  examples: |
-    - my pc isnt working
-    - my laptop is very slow
-    - the computer is broken
-    - something is wrong with my machine
-    - my screen is frozen
-  
 - intent: search_knowledge_base
   examples: |
     - how do I fix my [vpn](search_topic)?
     - can you help me with a [printer](search_topic) issue?
     - I need help with my [SAP](search_topic) password
     - search for a solution for my [laptop](search_topic)
+    - what do I do if my [monitor](search_topic) is flickering?
+    - tell me about [outlook](search_topic) issues
+    - help with [wifi](search_topic)
 
 - intent: report_issue
   examples: |
@@ -46,3 +56,30 @@ nlu:
     - I need to report a problem. My [outlook is not syncing](issue_description).
     - create a ticket for me
     - log an issue
+    - I need to file a ticket for an issue
+    - the [printer is jammed again](issue_description)
+
+- intent: check_system_status
+  examples: |
+    - is [sap](application) down?
+    - what is the status of the [vpn](application)?
+    - check [email](application) status
+    - is [glpi](application) working?
+
+- intent: inform_urgency
+  examples: |
+    - it is [high](urgency) priority
+    - this is very [urgent](urgency:high)
+    - make it a [low](urgency) priority ticket
+    - not very important, just [low](urgency)
+    - just a [medium](urgency) priority issue
+    - it's of [medium](urgency) importance
+
+- intent: chitchat
+  examples: |
+    - are you a bot?
+    - are you human?
+    - who are you?
+    - what can you do?
+    - you are very helpful
+    - thanks so much
