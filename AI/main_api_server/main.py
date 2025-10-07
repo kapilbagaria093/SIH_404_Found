@@ -1,99 +1,141 @@
-# In /main_api_server/main.py
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+from pydantic import BaseModel
+from typing import List, Optional
 
-app = FastAPI(title="POWERGRID Main API")
-
-DATABASE_URL = "postgresql://postgres:kapilpostgres@localhost/powergrid_helpdesk"
-
+# --- Database Configuration ---
+DATABASE_URL = "postgresql://postgres:root@localhost/powergrid_helpdesk"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-AI_MICROSERVICE_URL = "http://localhost:8001/ai/analyze-ticket"
+# --- Microservice URLs ---
+AI_MICROSERVICE_URL = "http://localhost:8001/predict"
 RASA_SERVER_URL = "http://localhost:5005/webhooks/rest/webhook"
 
-# This endpoint receives the new ticket from the frontend
-# In /main_api_server/main.py
+app = FastAPI(title="PowerGrid IT Helpdesk API", version="1.0")
 
-@app.post("/api/tickets")
-async def create_ticket(ticket_data: dict):
-    description = ticket_data.get("description")
+# --- Pydantic Models (Data Schemas) ---
+class TicketCreate(BaseModel):
+    title: str
+    description: str
+    created_by_user_id: int
+    priority: Optional[str] = 'Medium'
 
-    # Step 1: Get the specific category from the AI
-    async with httpx.AsyncClient() as client:
-        ai_response = await client.post(AI_MICROSERVICE_URL, json={"description": description})
-        ai_analysis = ai_response.json()
-    
-    specific_category = ai_analysis.get("category")
+class Ticket(BaseModel):
+    id: int
+    title: str
+    description: str
+    status: str
+    priority: str
+    category: Optional[str] = None
+    created_by_user_id: int
+    assigned_to_user_id: Optional[int] = None
 
+    class Config:
+        from_attributes = True
+
+class ChatMessage(BaseModel):
+    sender: str
+    message: str
+
+# --- Database Dependency ---
+def get_db():
     db = SessionLocal()
     try:
-        # Step 2: Search for an agent who has solved a similar ticket
-        expert_agent_query = text("""
-            SELECT assigned_to_user_id FROM tickets
-            WHERE category = :category AND status = 'Resolved'
-            ORDER BY resolved_at DESC
-            LIMIT 1;
-        """)
-        result = db.execute(expert_agent_query, {"category": specific_category})
-        expert_agent_id = result.scalar_one_or_none()
-
-        assigned_agent = None
-        assigned_dept = None
-
-        if expert_agent_id:
-            # Step 3a: Expert found, assign directly to them
-            assigned_agent = expert_agent_id
-        else:
-            # Step 3b: No expert, fall back to department routing
-            # (This mapping would be stored in a config or another table)
-            department_map = {
-                "software_outlook": "Enterprise Applications",
-                "network_vpn": "Network Operations",
-                "hardware_printer": "Desktop Support"
-            }
-            dept_name = department_map.get(specific_category, "L1 Service Desk")
-            dept_query = text("SELECT id FROM departments WHERE name = :name")
-            result = db.execute(dept_query, {"name": dept_name})
-            assigned_dept = result.scalar_one()
-
-        # Step 4: Create the new ticket with the determined assignment
-        ticket_query = text("""
-            INSERT INTO tickets (title, description, category, status, created_by_user_id, assigned_to_user_id, assigned_department_id)
-            VALUES (:title, :description, :category, 'Open', :user_id, :agent_id, :dept_id)
-            RETURNING id;
-        """)
-        
-        result = db.execute(
-            ticket_query,
-            {
-                "title": ticket_data.get("title"),
-                "description": description,
-                "category": specific_category,
-                "user_id": 5, # Placeholder for logged-in user
-                "agent_id": assigned_agent,
-                "dept_id": assigned_dept,
-            },
-        )
-        new_ticket_id = result.scalar_one()
-        db.commit()
-
-        return {"message": "Ticket created and intelligently routed", "ticket_id": new_ticket_id}
+        yield db
     finally:
         db.close()
 
+# --- API Endpoints ---
 
-# Add this endpoint to /main_api_server/main.py
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the PowerGrid IT Helpdesk API"}
 
-# This endpoint receives a chat message from the frontend
+@app.post("/api/tickets", response_model=Ticket)
+async def create_ticket(ticket: TicketCreate, db: Session = Depends(get_db)):
+    """
+    Creates a new ticket, classifies it using the AI microservice,
+    and intelligently assigns it to an agent.
+    """
+    try:
+        # 1. Call AI Microservice to get the category
+        async with httpx.AsyncClient() as client:
+            response = await client.post(AI_MICROSERVICE_URL, json={"text": ticket.description})
+            response.raise_for_status()
+            category = response.json().get("category")
+
+        # 2. Find the best agent for this category (experience-based routing)
+        # This query finds an agent who has previously resolved a ticket of the same category.
+        query = text("""
+            SELECT assigned_to_user_id FROM tickets
+            WHERE category = :cat AND status = 'Resolved' AND assigned_to_user_id IS NOT NULL
+            GROUP BY assigned_to_user_id
+            ORDER BY COUNT(*) DESC
+            LIMIT 1;
+        """)
+        result = db.execute(query, {"cat": category}).fetchone()
+        assigned_agent_id = result[0] if result else None
+        
+        # Fallback: If no experienced agent is found, assign to L1 Service Desk
+        if not assigned_agent_id:
+            query = text("SELECT id FROM users WHERE department_id = (SELECT id FROM departments WHERE name = 'L1 Service Desk') LIMIT 1;")
+            result = db.execute(query).fetchone()
+            assigned_agent_id = result[0] if result else 1 # Default to user 1 if no one is in L1
+
+        # 3. Create the new ticket in the database
+        insert_query = text("""
+            INSERT INTO tickets (title, description, priority, category, created_by_user_id, assigned_to_user_id)
+            VALUES (:title, :description, :priority, :category, :created_by_user_id, :assigned_to_user_id)
+            RETURNING id, title, description, status, priority, category, created_by_user_id, assigned_to_user_id;
+        """)
+        new_ticket_data = db.execute(insert_query, {
+            "title": ticket.title,
+            "description": ticket.description,
+            "priority": ticket.priority,
+            "category": category,
+            "created_by_user_id": ticket.created_by_user_id,
+            "assigned_to_user_id": assigned_agent_id
+        }).fetchone()
+
+        db.commit()
+
+        return new_ticket_data
+
+    except httpx.RequestError:
+        raise HTTPException(status_code=503, detail="AI microservice is unavailable.")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"An internal server error occurred: {e}")
+
+
+@app.get("/api/tickets", response_model=List[Ticket])
+def get_all_tickets(db: Session = Depends(get_db)):
+    """
+    Retrieves all tickets from the database.
+    """
+    result = db.execute(text("SELECT * FROM tickets;")).fetchall()
+    return result
+
 @app.post("/api/chatbot/message")
-async def chat_with_bot(message_data: dict):
-    # Forward the message directly to the Rasa server's webhook [cite: 44, 46]
-    async with httpx.AsyncClient() as client:
-        rasa_response = await client.post(RASA_SERVER_URL, json=message_data)
-        bot_response = rasa_response.json()
-
-    # Return Rasa's response directly to the frontend [cite: 51, 53]
-    return bot_response
+async def chat_with_bot(message: ChatMessage):
+    """
+    Forwards a user's message to the Rasa chatbot and returns its response.
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                RASA_SERVER_URL,
+                json={"sender": message.sender, "message": message.message},
+                timeout=60
+            )
+            response.raise_for_status()
+            return response.json()
+            
+    except httpx.RequestError:
+        raise HTTPException(status_code=503, detail="The chatbot service is unavailable.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
