@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional, Union
 import joblib
 import spacy
 from sentence_transformers import SentenceTransformer, util
 import torch
 
 # --- 1. SETUP ---
-# Initialize the FastAPI app
 app = FastAPI(title="POWERGRID Helpdesk AI Engine")
 
 # Load models only once at startup
@@ -15,13 +15,12 @@ try:
     label_encoder = joblib.load('model_artifacts/label_encoder.pkl')
     nlp_ner = spacy.load('en_core_web_sm')
     similarity_model = SentenceTransformer('all-MiniLM-L6-v2')
-    print("Models loaded successfully.")
+    print("✅ All models loaded successfully.")
 except FileNotFoundError:
-    print("Model files not found. Please run train.py first.")
+    print("❌ Model files not found. Please run train.py first.")
     exit()
 
-# In-memory cache to simulate recent tickets for duplicate detection
-# In a real app, this would be a proper database or cache like Redis
+# In-memory cache for duplicate detection
 RECENT_TICKETS_CACHE = []
 RECENT_TICKETS_VECTORS = []
 CACHE_SIZE = 50
@@ -34,7 +33,7 @@ class AnalysisResult(BaseModel):
     category: str
     entities: dict
     is_duplicate: bool
-    duplicate_score: float | None = None
+    duplicate_score: Optional[float] = None  # Fixed for Python 3.9
 
 # --- 3. THE API ENDPOINT ---
 @app.post("/ai/analyze-ticket", response_model=AnalysisResult)
@@ -47,7 +46,6 @@ async def analyze_ticket(ticket: TicketText):
     """
     
     # --- Task 1: Classification ---
-    # Predict the numeric label and then decode it to the original category name
     predicted_idx = classifier.predict([ticket.description])[0]
     predicted_category = label_encoder.inverse_transform([predicted_idx])[0]
 
@@ -59,27 +57,23 @@ async def analyze_ticket(ticket: TicketText):
     is_duplicate = False
     max_similarity = 0.0
     
-    # Convert incoming ticket to a vector
     new_ticket_vector = similarity_model.encode(ticket.description, convert_to_tensor=True)
 
     if RECENT_TICKETS_VECTORS:
-        # Calculate cosine similarity against all cached vectors
         similarities = util.pytorch_cos_sim(new_ticket_vector, torch.stack(RECENT_TICKETS_VECTORS))[0]
         max_similarity = round(torch.max(similarities).item(), 2)
 
-        if max_similarity > 0.90: # Similarity threshold
+        if max_similarity > 0.90:
             is_duplicate = True
 
     # Update the cache
     if not is_duplicate:
         RECENT_TICKETS_CACHE.append(ticket.description)
         RECENT_TICKETS_VECTORS.append(new_ticket_vector)
-        # Keep the cache from growing indefinitely
         if len(RECENT_TICKETS_CACHE) > CACHE_SIZE:
             RECENT_TICKETS_CACHE.pop(0)
             RECENT_TICKETS_VECTORS.pop(0)
 
-    # --- 4. Return the result ---
     return AnalysisResult(
         category=predicted_category,
         entities=entities,
@@ -90,3 +84,7 @@ async def analyze_ticket(ticket: TicketText):
 @app.get("/")
 def read_root():
     return {"message": "POWERGRID AI Helpdesk Engine is running."}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "models_loaded": True}
