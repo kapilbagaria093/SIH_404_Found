@@ -10,6 +10,7 @@ intents:
   - check_system_status
   - inform_urgency
   - chitchat
+  - stop_form
 
 entities:
   - application
@@ -25,46 +26,73 @@ slots:
       entity: issue_description
   urgency:
     type: categorical
-    values:
-      - low
-      - medium
-      - high
+    values: [low, medium, high]
     mappings:
     - type: from_entity
       entity: urgency
+  kb_steps:
+    type: list
+    mappings:
+    - type: custom
+  current_step_index:
+    type: float
+    min_value: 0.0
+    max_value: 100.0
+    mappings:
+    - type: custom
 
 responses:
   utter_greet:
-  - text: "Hey! I'm the POWERGRID IT assistant. How can I help?"
+  - text: "Hello! I'm the POWERGRID IT virtual assistant. I can help you find solutions, check system status, or create a ticket. What do you need?"
   utter_goodbye:
-  - text: "Goodbye! Let me know if you need anything else."
+  - text: "Goodbye! Feel free to reach out if you need anything else."
   utter_ask_issue_description:
-  - text: "Okay, I can create a ticket. First, please describe your issue in one sentence."
+  - text: "Understood. To create a ticket, I need a brief description of the problem."
   utter_ask_urgency:
-  - text: "Got it. And how urgent is this issue? (low, medium, or high)"
+  - text: "Got it. How urgent is this issue? You can say low, medium, or high."
   utter_submit_ticket:
-  - text: "Thank you. I have created a {urgency} priority ticket for the issue: '{issue_description}'. The IT team will be in touch."
-  utter_solution_found:
-  - text: "Based on your request, I found a potential solution in our knowledge base:\n\n{solution_text}"
-  utter_ask_if_solution_helped:
-  - text: "Did this solution help resolve your issue?"
+  - text: "Thank you. Your {urgency} priority ticket for '{issue_description}' has been successfully created with ID: {ticket_id}."
+  utter_ticket_creation_failed:
+  - text: "I'm sorry, I encountered an error and could not create your ticket. Please contact the IT helpdesk directly."
+  utter_start_troubleshooting:
+  - text: "I found a guide that might help. Let's try the first step:"
+  utter_next_step:
+  - text: "Okay, that didn't work. Let's try the next step:"
+  utter_no_more_steps:
+  - text: "We've run out of automated steps. I'm sorry I couldn't resolve the issue."
   utter_glad_it_helped:
-  - text: "Excellent! I'm glad I could help. Is there anything else you need?"
+  - text: "Excellent! I'm glad we could resolve your issue. Is there anything else I can help with today?"
   utter_offer_create_ticket:
-  - text: "I'm sorry to hear that didn't work. Would you like me to create a ticket for you so a human agent can take a look?"
+  - text: "Would you like me to create a ticket for you so our team can investigate?"
   utter_no_solution_found:
-  - text: "I couldn't find a direct solution for that. Would you like me to create a ticket?"
-  utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
+  - text: "I couldn't find a guide for that topic in our knowledge base. Should I create a ticket for you?"
   utter_ok_no_ticket:
-  - text: "Okay, I will not create a ticket. Let me know if you need anything else."
+  - text: "Okay, I will not create a ticket. Let me know if you change your mind."
   utter_ask_urgency_invalid:
-  - text: "That's not a valid urgency. Please choose from low, medium, or high."
+  - text: "My apologies, but urgency must be one of the following: low, medium, or high."
+  # Fallback and Chit-Chat Responses
+  utter_ask_rephrase:
+  - text: "I'm sorry, I'm not sure how to help with that. Could you try rephrasing your request?"
+  utter_chitchat/ask_how_are_you:
+  - text: "I'm a bot, so I'm always running at 100%! How can I help you?"
+  utter_chitchat/ask_who_are_you:
+  - text: "I am the POWERGRID IT virtual assistant, designed to help you with your tech issues."
+  utter_chitchat/handle_insult:
+  - text: "I am programmed to be helpful. Let's focus on solving your IT issue."
+  utter_chitchat/handle_thanks:
+  - text: "You're welcome! That's what I'm here for."
+  # Form Interruption Responses
+  utter_stop_form_and_ask:
+  - text: "Okay, I've paused the ticket creation process. What would you like to do instead?"
+  utter_ask_continue_form:
+  - text: "Would you like to continue creating your ticket?"
 
 actions:
 - action_check_status
-- action_search_kb
+- action_interactive_kb_search
+- action_troubleshooting_followup
 - validate_ticket_form
+- action_default_fallback
 
 forms:
   ticket_form:
